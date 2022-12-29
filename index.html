@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Labexam</title>
+</head>
+<body>
+    <pre>
+        <hr>
+
+        EXPERIMENT-1
+
+Write a program to compute CRC code for the polynomials CRC-12, CRC-16
+and CRC CCIP
+
+Program:
+import java.lang.*; 
+    import java.util.*;  
+    // create CRCExample class to demonstrate the working of Cyclic Redundancy Check  
+    class CRCExample {  
+        // main() method start  
+        public static void main(String args[]) {  
+            // create scanner class object to take input from user  
+            Scanner scan = new Scanner(System.in);  
+            // declare n for the size of the data  
+            int size;  
+            // take the size of the data from the user  
+            System.out.println("Enter the size of the data array: ");  
+            size = scan.nextInt();  
+            // declaration of the data array  
+            int data[] = new int[size];  
+            // take bits of the data from the user  
+            System.out.println("Enter data bits in the array one by one: ");  
+            for(int i = 0 ; i < size ; i++) {  
+                System.out.println("Enter bit " + (size-i) + ":");  
+                data[i] = scan.nextInt();  
+            }  
+            // take the size of the divisor from the user  
+            System.out.println("Enter the size of the divisor array:");  
+            size = scan.nextInt();  
+            // declaration of the divisor array  
+            int divisor[] = new int[size];  
+            System.out.println("Enter divisor bits in the array one by one: ");  
+            for(int i = 0 ; i < size ; i++) {  
+                System.out.println("Enter bit " + (size-i) + ":");  
+                divisor[i] = scan.nextInt();  
+            }  
+        // Divide the input data by the input divisor and store the result in the rem array  
+            int rem[] = divideDataWithDivisor(data, divisor);  
+            // iterate rem using for loop to print each bit  
+            for(int i = 0; i < rem.length-1; i++) {  
+                System.out.print(rem[i]);  
+            }  
+            System.out.println("\nGenerated CRC code is: ");  
+              
+            for(int i = 0; i < data.length; i++) {  
+                System.out.print(data[i]);  
+            }  
+            for(int i = 0; i < rem.length-1; i++) {  
+                System.out.print(rem[i]);  
+            }  
+            System.out.println();  
+            // we create a new array that contains the original data with its CRC code  
+            // the size of the sentData array with be equal to the sum of the data and the rem arrays length  
+            int sentData[] = new int[data.length + rem.length - 1];  
+            System.out.println("Enter bits in the array which you want to send: ");  
+            for(int i = 0; i < sentData.length; i++) {  
+                System.out.println("Enter bit " +(sentData.length - 1)+ ":");  
+                sentData[i] = scan.nextInt();  
+            }  
+            receiveData(sentData, divisor);  
+        }  
+        // create divideDataWithDivisor() method to get CRC  
+        static int[] divideDataWithDivisor(int oldData[], int divisor[]) {  
+            // declare rem[] array  
+            int rem[] = new int[divisor.length];  
+            int i;  
+            int data[] = new int[oldData.length + divisor.length];  
+        // use system's arraycopy() method for copying data into rem and data arrays  
+            System.arraycopy(oldData, 0, data, 0, oldData.length);  
+            System.arraycopy(data, 0, rem, 0, divisor.length);  
+            // iterate the oldData and exor the bits of the remainder and the divisor  
+            for(i = 0; i < oldData.length; i++) {  
+                System.out.println((i+1) + ".) First data bit is : "+ rem[0]);  
+                System.out.print("Remainder : ");  
+                if(rem[0] == 1) {  
+                    // We have to exor the remainder bits with divisor bits  
+                    for(int j = 1; j < divisor.length; j++) {  
+                        rem[j-1] = exorOperation(rem[j], divisor[j]);  
+                        System.out.print(rem[j-1]);  
+                    }  
+                }  
+                else {  
+                    // We have to exor the remainder bits with 0  
+                    for(int j = 1; j < divisor.length; j++) {  
+                        rem[j-1] = exorOperation(rem[j], 0);  
+                        System.out.print(rem[j-1]);  
+                    }  
+                }  
+                // The last bit of the remainder will be taken from the data  
+                // This is the 'carry' taken from the dividend after every step  
+                // of division  
+                rem[divisor.length-1] = data[i+divisor.length];  
+                System.out.println(rem[divisor.length-1]);  
+            }  
+            return rem;  
+        }  
+        // create exorOperation() method to perform exor data  
+        static int exorOperation(int x, int y) {  
+            // This simple function returns the exor of two bits  
+            if(x == y) {  
+                return 0;  
+            }  
+            return 1;  
+        }  
+        // method to print received data   
+        static void receiveData(int data[], int divisor[]) {  
+           
+            int rem[] = divideDataWithDivisor(data, divisor);  
+            // Division is done  
+            for(int i = 0; i < rem.length; i++) {  
+                if(rem[i] != 0) {  
+                    // if the remainder is not equal to zero, data is currupted  
+                    System.out.println("Currupted data received...");  
+                    return;  
+                }  
+            }  
+            System.out.println("Data received without any error.");  
+        }  
+    }  
+OUTPUT:
+
+
+
+<hr>
+
+EXPERIMENT-2
+
+Develop a simple data link layer that performs the flow control using the sliding window protocol and loss recovery using the Go-Back-N mechanism.
+
+Program:
+import java.lang.*;
+import java.io.*;
+public class GoBackN {
+
+ public static void main(String args[]) throws IOException
+ {
+  BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+  
+  System.out.println("Please enter the Window Size: ");
+  int window = Integer.parseInt(br.readLine());
+  
+  boolean loop = true;
+  int sent = 0;
+  
+  while(loop)
+  {
+   
+   for(int i = 0; i < window; i++)
+   {
+    System.out.println("Frame " + sent + " has been transmitted.");
+    sent++;
+    if(sent == window)
+     break;
+   }
+      System.out.println("Please enter the last Acknowledgement received.");
+   int ack = Integer.parseInt(br.readLine());
+   
+   if(ack == window)
+    loop = false;
+   else
+    sent = ack;
+  }
+   }
+}
+
+OUTPUT:
+
+<hr>
+
+EXPERIMENT-3
+
+Take an example subnet of hosts and obtain a broadcast tree for the subnet.
+
+Program:
+
+import java.util.*;
+import java.io.*;
+class SubnettingClassful {
+ public static void main(String args[]) {
+  System.out.println("Enter the Network address");
+  Scanner sc = new Scanner(System.in);
+  String ip = sc.next();
+  String[] IPs = ip.split("\\.");
+  int[] IP = new int[IPs.length];
+  for (int i = 0; i < IPs.length; i++) {
+   IP[i] = Integer.parseInt(IPs[i]);
+   //System.out.println(IP[i]);
+  }
+  System.out.println("Enter the number of Subnets");
+  int sub = sc.nextInt();
+  int temp = IP[0];
+  int mask;
+  if (temp < 128) {
+   mask = 8;
+  } else if (temp < 192) {
+   mask = 16;
+  } else if (temp < 224) {
+   mask = 24;
+  } else {
+   System.out.println("Invalid IP for subnetting");
+   return;
+  }
+  int rem = 32 - mask;
+  long incr1 = 0;
+  long incr = ((long) Math.round(Math.pow(2, rem))) / sub;
+  long incr2 = incr;
+  long t1 = 0;
+  //System.out.println(rem+"    "+incr1+"\t"+incr2);
+  for (int j = 0; j < sub; j++) {
+   t1 = incr2;
+   //System.out.println(incr2);
+   System.out.print(IP[0]);
+   System.out.print("." + (IP[1] + (incr1 / (256 * 256))) % 256);
+   System.out.print("." + (IP[2] + (incr1 / 256)) % 256);
+   System.out.print("." + (IP[3] + (incr1 % 256)));
+
+   System.out.print("\t-TO-\t");
+   System.out.print(IP[0]);
+   System.out.print("." + (IP[1] + (t1 / (256 * 256)) - 1) % 256);
+
+   System.out.print("." + (IP[2] + (t1 / 256) - 1) % 256);
+   System.out.print("." + (IP[3] + ((t1 - 1) % 256)));
+   System.out.println("\n");
+   incr1 = incr2;
+   incr2 = incr1 + incr;
+  }
+ }
+}
+
+
+OUTPUT:
+
+
+<hr>
+
+
+
+EXPERIMENT-4
+
+Implement distance vector routing algorithm for obtaining routing tables at each node.
+
+Program:
+
+import java.io.*;
+public class DVR 
+{
+ static int graph[][];
+ static int via[][];
+ static int rt[][];
+ static int v;
+ static int e;
+
+ public static void main(String args[]) throws IOException
+ {
+  BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+  
+  System.out.println("Please enter the number of Vertices: ");
+  v = Integer.parseInt(br.readLine());
+  
+  System.out.println("Please enter the number of Edges: ");
+  e = Integer.parseInt(br.readLine());
+  
+  graph = new int[v][v];
+  via = new int[v][v];
+  rt = new int[v][v];
+  for(int i = 0; i < v; i++)
+   for(int j = 0; j < v; j++)
+   {
+    if(i == j)
+     graph[i][j] = 0;
+    else
+     graph[i][j] = 9999;
+   }
+  
+  for(int i = 0; i < e; i++)
+  {
+   System.out.println("Please enter data for Edge " + (i + 1) + ":");
+   System.out.print("Source: ");
+   int s = Integer.parseInt(br.readLine());
+   s--;
+   System.out.print("Destination: ");
+   int d = Integer.parseInt(br.readLine());
+   d--;
+   System.out.print("Cost: ");
+   int c = Integer.parseInt(br.readLine());
+   graph[s][d] = c;
+   graph[d][s] = c;
+  }
+  
+  dvr_calc_disp("The initial Routing Tables are: ");
+  
+  System.out.print("Please enter the Source Node for the edge whose cost has changed: ");
+  int s = Integer.parseInt(br.readLine());
+  s--;
+  System.out.print("Please enter the Destination Node for the edge whose cost has changed: ");
+  int d = Integer.parseInt(br.readLine());
+  d--;
+  System.out.print("Please enter the new cost: ");
+  int c = Integer.parseInt(br.readLine());
+  graph[s][d] = c;
+  graph[d][s] = c;
+  
+  dvr_calc_disp("The new Routing Tables are: ");
+ }
+ 
+ static void dvr_calc_disp(String message)
+ {
+  System.out.println();
+  init_tables();
+  update_tables();
+  System.out.println(message);
+  print_tables();
+  System.out.println();
+ }
+ 
+ static void update_table(int source)
+ {
+  for(int i = 0; i < v; i++)
+  {
+   if(graph[source][i] != 9999)
+   {
+    int dist = graph[source][i];
+    for(int j = 0; j < v; j++)
+    {
+     int inter_dist = rt[i][j];
+     if(via[i][j] == source)
+      inter_dist = 9999;
+     if(dist + inter_dist < rt[source][j])
+     {
+      rt[source][j] = dist + inter_dist;
+      via[source][j] = i;
+     }
+    }
+   }
+  }
+ }
+ 
+ static void update_tables()
+ {
+  int k = 0;
+  for(int i = 0; i < 4*v; i++)
+  {
+   update_table(k);
+   k++;
+   if(k == v)
+    k = 0;
+  }
+ }
+ 
+ static void init_tables()
+ {
+  for(int i = 0; i < v; i++)
+  {
+   for(int j = 0; j < v; j++)
+   {
+    if(i == j)
+    {
+     rt[i][j] = 0;
+     via[i][j] = i;
+    }
+    else
+    {
+     rt[i][j] = 9999;
+     via[i][j] = 100;
+    }
+   }
+  }
+ }
+ 
+ static void print_tables()
+ {
+  for(int i = 0; i < v; i++)
+  {
+   for(int j = 0; j < v; j++)
+   {
+    System.out.print("Dist: " + rt[i][j] + "    ");
+   }
+   System.out.println();
+  }
+ }
+ 
+}
+OUTPUT:
+
+
+
+<hr>
+EXPERIMENT-5
+Design the following
+a. TCP iterative Client and server application to reverse the given input sentence.
+
+Server Program:
+
+import java.net.*;
+import java.io.*;
+public class ServerRevString{
+public static void main(String arg[]) throws Exception{
+ServerSocket server = new ServerSocket(1234);
+System.out.println("Server is Waiting");
+while(true){
+Socket con = server.accept();
+DataInputStream in = new DataInputStream(con.getInputStream());
+DataOutputStream out = new DataOutputStream(con.getOutputStream());
+StringBuilder inp = new StringBuilder(in.readUTF().toString());
+StringBuilder op=inp.reverse();
+out.writeUTF(op.toString());
+System.out.println(op.toString());
+}
+}
+}
+
+Client Program:
+
+import java.net.*;
+import java.io.*;
+import java.util.Scanner;
+public class ClientRevString{
+public static void main(String arg[]) throws Exception{
+InetAddress ia = InetAddress.getLocalHost();
+Socket cSock = new Socket(ia,1234);
+DataInputStream in = new DataInputStream(cSock.getInputStream());
+DataOutputStream out = new DataOutputStream(cSock.getOutputStream());
+System.out.println("Please Enter String");
+Scanner sc = new Scanner(System.in);
+String inp = sc.nextLine();
+out.writeUTF(inp);
+// System.out.println("response from server");
+// System.out.println(in.readUTF().toString());
+cSock.close();
+}
+}
+
+OUTPUT:
+
+
+
+<hr>
+
+b. TCP client and server application to transfer file.
+
+
+Program
+File Server :
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+public class FileServer
+{
+ public static void main(String[] args) throws Exception
+{
+ //Initialize Sockets
+ ServerSocket ssock = new ServerSocket(5000);
+ Socket socket = ssock.accept();
+ //The InetAddress specification
+ InetAddress IA = InetAddress.getByName("localhost");
+ //Specify the file
+ File file = new File("e:\\Bookmarks.html");
+ FileInputStream fis = new FileInputStream(file);
+ BufferedInputStream bis = new BufferedInputStream(fis);
+ //Get socket's output stream
+ OutputStream os = socket.getOutputStream();
+ //Read File Contents into contents array
+ byte[] contents;
+ long fileLength = file.length();
+ long current = 0;
+ long start = System.nanoTime();
+ while(current!=fileLength){
+ int size = 10000;
+ if(fileLength - current >= size)
+ current += size;
+ else{
+ size = (int)(fileLength - current);
+ current = fileLength;
+ }
+ contents = new byte[size];
+ bis.read(contents, 0, size);
+ os.write(contents);
+ System.out.print("Sending file ... "+(current*100)/fileLength+"% complete!");
+ }
+ os.flush();
+ //File transfer done. Close the socket connection!
+ socket.close();
+ ssock.close();
+ System.out.println("File sent succesfully!");
+ } }
+
+
+File Client:
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+public class FileClient {
+ public static void main(String[] args) throws Exception{
+ //Initialize socket
+ Socket socket = new Socket(InetAddress.getByName("localhost"), 5000);
+ byte[] contents = new byte[10000];
+ //Initialize the FileOutputStream to the output file's full path.
+ FileOutputStream fos = new FileOutputStream("e:\\Bookmarks1.html");
+ BufferedOutputStream bos = new BufferedOutputStream(fos);
+ InputStream is = socket.getInputStream();
+ //No of bytes read in one read() call
+ int bytesRead = 0;
+ while((bytesRead=is.read(contents))!=-1)
+ bos.write(contents, 0, bytesRead);
+ bos.flush();
+ socket.close();
+ System.out.println("File saved successfully!");
+ }
+}
+OUTPUT:
+
+
+
+<hr>
+
+
+c. TCP concurrent server to convert a given text into upper case.
+
+Program:
+Server:
+
+import java.io.*;
+import java.net.*;
+
+public class Server
+{
+    public static void main(String args[])
+    {
+        String messageIn;
+        String messageOut;
+        
+        try {
+            ServerSocket ssock = new ServerSocket(6789);
+            while(true)
+            {
+                Socket connsock = ssock.accept();
+                
+                InputStreamReader inStr =  
+                    new InputStreamReader(connsock.getInputStream());
+                
+                BufferedReader inNet = new BufferedReader(inStr);
+                
+                DataOutputStream outNet = 
+                    new DataOutputStream(connsock.getOutputStream());
+                
+                messageIn = inNet.readLine();
+                messageOut = messageIn.toUpperCase() + "\n";
+                outNet.writeBytes(messageOut);
+            }
+        }
+        catch(IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+}
+
+Client:
+
+import java.io.*;
+import java.net.*;
+
+public class Client  
+{
+    public static void main(String[] args)
+    {
+        String  message = null;
+
+        try {
+            BufferedReader kbd = 
+                new BufferedReader(new InputStreamReader(System.in));
+            
+            Socket csock = new Socket("localhost", 6789);
+
+            DataOutputStream outNet = 
+                new DataOutputStream(csock.getOutputStream());
+            
+            BufferedReader inNet = 
+                new BufferedReader(new InputStreamReader(csock.getInputStream()));
+            
+            message = kbd.readLine();
+            outNet.writeBytes(message + "\n");
+            
+            message = inNet.readLine();
+            csock.close();
+            
+            System.out.println("Server sent: " + message);
+        }
+        catch(IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+}
+
+
+OUTPUT:
+
+
+
+<hr>
+
+
+
+
+d. TCP concurrent server to echo given set of sentences.
+
+Socket server:
+package com.journaldev.socket;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.lang.ClassNotFoundException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+/**
+ * This class implements java Socket server
+*/
+public class SocketServerExample {
+    
+    //static ServerSocket variable
+    private static ServerSocket server;
+    //socket server port on which it will listen
+    private static int port = 9876;
+    
+    public static void main(String args[]) throws IOException, ClassNotFoundException{
+        //create the socket server object
+        server = new ServerSocket(port);
+        //keep listens indefinitely until receives 'exit' call or program terminates
+        while(true){
+            System.out.println("Waiting for the client request");
+            //creating socket and waiting for client connection
+            Socket socket = server.accept();
+            //read from socket to ObjectInputStream object
+            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+            //convert ObjectInputStream object to String
+            String message = (String) ois.readObject();
+            System.out.println("Message Received: " + message);
+            //create ObjectOutputStream object
+            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            //write object to Socket
+            oos.writeObject("Hi Client "+message);
+            //close resources
+            ois.close();
+            oos.close();
+            socket.close();
+            //terminate the server if client sends exit request
+            if(message.equalsIgnoreCase("exit")) break;
+        }
+        System.out.println("Shutting down Socket server!!");
+        //close the ServerSocket object
+        server.close();
+    }
+    
+}
+
+
+
+socket client:
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+/**
+ * This class implements java socket client
+ 
+ */
+public class SocketClientExample {
+
+    public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException, InterruptedException{
+        //get the localhost IP address, if server is running on some other IP, you need to use that
+        InetAddress host = InetAddress.getLocalHost();
+        Socket socket = null;
+        ObjectOutputStream oos = null;
+        ObjectInputStream ois = null;
+        for(int i=0; i < 5;i++){
+            //establish socket connection to server
+            socket = new Socket(host.getHostName(), 9876);
+            //write to socket using ObjectOutputStream
+            oos = new ObjectOutputStream(socket.getOutputStream());
+            System.out.println("Sending request to Socket Server");
+            if(i==4)oos.writeObject("exit");
+            else oos.writeObject(""+i);
+            //read the server response message
+            ois = new ObjectInputStream(socket.getInputStream());
+            String message = (String) ois.readObject();
+            System.out.println("Message: " + message);
+            //close resources
+            ois.close();
+            oos.close();
+            Thread.sleep(100);
+        }
+    }
+}
+
+
+
+
+<hr>
+
+
+
+
+EXPERIMENT-6
+
+Design the following
+a. UDP Client and server application to reverse the given input sentence 2018-2019 173.
+
+Program:
+Client:
+import java.io.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+public class ClientReverse {
+    public static void main(String[] args) throws Exception{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        DatagramSocket clientSocket = new DatagramSocket();
+        InetAddress IPAdress = InetAddress.getLoopbackAddress();
+        byte [] sendData = new byte[1024];
+        byte [] receiveData = new byte[1024];
+        String str = br.readLine();
+        sendData = str.getBytes();
+        DatagramPacket dgp = new        DatagramPacket(sendData,sendData.length,IPAdress,9999);
+        clientSocket.send(dgp);
+        dgp = new DatagramPacket(receiveData, receiveData.length);
+        clientSocket.receive(dgp);
+        str = new String(dgp.getData());
+        System.out.println(\"Output: \" + str);
+        clientSocket.close();
+        br.close();
+    }
+}
+
+Server.java:
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+public class ServerReverse {
+    public static String reverseInt(int num) {
+        int ans = 0;
+        while (num > 0) {
+            ans = ans * 10 + (num % 10);
+            num = num / 10;
+        }
+        return String.valueOf(ans);
+    }
+    public static void main(String[] args) throws Exception {
+        DatagramSocket dgs = new DatagramSocket(9999);
+        byte[] receiveData = new byte[1024];
+        byte[] sendData = new byte[1024];
+        DatagramPacket dgp;
+        dgp = new DatagramPacket(receiveData, receiveData.length);
+        dgs.receive(dgp);
+        String str = new String(dgp.getData());
+        System.out.println(\"Data Received: \" + str);
+        InetAddress IPAddress = dgp.getAddress();
+        String ans = ServerReverse.reverseInt(Integer.parseInt(str.toString()));
+        sendData = ans.getBytes();
+        dgp = new DatagramPacket(sendData, sendData.length, IPAddress, dgp.getPort());
+        dgs.send(dgp);
+    }
+}
+OUTPUT:
+
+
+
+<hr>
+
+
+
+
+b. UDP Client server to transfer a file.
+
+Program:
+/*CLIENT */
+import java.net.*;
+import java.io.*;
+public class client
+{
+            public static void main(String args[])throws Exception
+            {         
+                        byte b[]=new byte[1024];
+                        FileInputStream f=new FileInputStream("D:/raj.txt");
+                        DatagramSocket dsoc=new DatagramSocket(2000);
+                        int i=0;
+                        while(f.available()!=0)
+                        {
+                                    b[i]=(byte)f.read();
+                                    i++;
+                        }                     
+                        f.close();
+                        dsoc.send(new DatagramPacket(b,i,InetAddress.getLocalHost(),1000));
+            }
+}
+
+
+
+/*SERVER */
+import java.net.*;
+import java.io.*;
+public class server
+{
+            public static void main(String args[])throws IOException
+            {
+                        byte b[]=new byte[3072];
+                        DatagramSocket dsoc=new DatagramSocket(1000);
+                        FileOutputStream f=new FileOutputStream("D:/nandha.txt");
+                        while(true)
+                        {
+                                    DatagramPacket dp=new DatagramPacket(b,b.length);
+                                    dsoc.receive(dp);
+                                    System.out.println(new String(dp.getData(),0,dp.getLength()));                             
+
+                        }
+            }
+}
+OUTPUT:
+
+
+
+<hr>
+
+
+
+
+EXPERIMENT-7
+
+Programs to demonstrate the usage of Advanced socket system calls like
+getsockopt( ), setsockopt(), getpeername ( ),getsockname( ),readv( ) and writev().
+
+Program:
+
+/*GET SET SOCK*/
+#include< stdio.h>
+#include< stdlib.h>
+#include< errno.h>
+#include< string.h>
+#include< sys/types.h>
+#include< sys/socket.h>
+#include< netinet/in.h>
+#include< netinet/tcp.h>
+int main()
+{
+        int sockfd,maxseg,sendbuff,optlen;
+        if((sockfd=socket(AF_INET,SOCK_STREAM,0))< 0)
+        {
+                perror("socket");
+                exit(0);
+        }
+        optlen=sizeof(maxseg);
+        if(getsockopt(sockfd,IPPROTO_TCP,TCP_MAXSEG,(char *)&maxseg,&optlen)< 0)
+        {
+                perror("get sockopt1");
+                exit(0);
+        }
+        printf("\n TCP maxseg=%d",maxseg);
+        sendbuff=12324;
+        if(setsockopt(sockfd,SOL_SOCKET,SO_SNDBUF,(char *)&sendbuff,sizeof(sendbuff))< 0)
+        {
+                perror("set socketopt");
+                exit(0);
+        }
+        optlen=sizeof(sendbuff);
+        if(getsockopt(sockfd,SOL_SOCKET,SO_SNDBUF,(char *)&sendbuff,&optlen)< 0)
+        {
+                perror("getsockopt2");
+                exit(0);
+        }
+        printf("\n send buffer size=%d\n",sendbuff);
+}
+OUTPUT:
+[mca02-08@localhost ~]$ gcc getsetsock.c
+[mca02-08@localhost ~]$ ./a.out 5647
+ TCP maxseg=536
+ send buffer size=24648
+
+getsockname:
+
+
+#include < stdio.h>
+#include < stdlib.h>
+#include < string.h>
+#include < unistd.h>
+#include < sys/socket.h>
+#include <  netinet/in.h>
+#include < arpa/inet.h>
+
+#define SERVER_ADDR "172.217.160.99"
+#define SERVER_PORT 80
+
+int main()
+{
+    char myIP[16];
+    unsigned int myPort;
+    struct sockaddr_in server_addr, my_addr;
+    int sockfd;
+
+    // Connect to server
+    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        perror("Can't open stream socket.");
+        exit(-1);
+    }
+
+    // Set server_addr
+    bzero(&server_addr, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = inet_addr(SERVER_ADDR);
+    server_addr.sin_port = htons(SERVER_PORT);
+
+    // Connect to server
+    if (connect(sockfd, (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0) {
+        perror("Connect server error");
+        close(sockfd);
+        exit(-1);
+    }
+
+    // Get my ip address and port
+    bzero(&my_addr, sizeof(my_addr));
+    socklen_t len = sizeof(my_addr);
+    getsockname(sockfd, (struct sockaddr *) &my_addr, &len);
+    inet_ntop(AF_INET, &my_addr.sin_addr, myIP, sizeof(myIP));
+    myPort = ntohs(my_addr.sin_port);
+
+    printf("Local ip address: %s\n", myIP);
+    printf("Local port : %u\n", myPort);
+
+    return 0;
+}
+or
+#include < stdio.h>
+#include < string.h>
+#include < sys/types.h>
+#include < sys/socket.h>
+#include < netinet/in.h>
+
+int main (void) {
+    int fd = socket (AF_INET, SOCK_STREAM, 0);
+    struct sockaddr_in _self;
+    int len = sizeof (_self);
+
+    memset (&_self, 0, len);
+    bind(fd, (struct sockaddr *) &_self, len);
+
+    memset (&_self, 42, len);
+    getsockname (fd, (struct sockaddr *) &_self, &len);
+    printf ("%s\n", inet_ntoa (_self.sin_addr));
+
+    return 0;
+}
+
+
+Getpeername:
+
+using getpeername sample c function code
+
+/* getpeer.c
+ * Demonstrate getpeername(2):
+ */
+ #include < stdio.h>
+ #include < unistd.h>
+ #include < stdlib.h>
+ #include < errno.h>
+ #include < string.h>
+ #include < sys/types.h>
+ #include < sys/stat.h>
+ #include < sys/socket.h>
+ #include < sys/un.h>
+ #include < netinet/in.h>
+ #include < arpa/inet.h>
+
+
+/*
+ * This function accepts as input a socket
+ * for which a peer socket address must be
+ * determined for it. Then the address
+ * is converted into a string and returned.
+ *
+ * If an error occurs, NULL is returned.
+ */
+ char * peer_addr(int s, char *buf, size_t bufsiz) {
+    int z; /* Status return code */
+    struct sockaddr_in adr_inet;/* AF_INET */
+    int len_inet; /* length */
+
+/*
+ * Obtain the address of the socket:
+ */
+    len_inet = sizeof adr_inet;
+
+    z = getpeername(s, (struct sockaddr *)&adr_inet, &len_inet);
+    if ( z == -1) {
+       return NULL; /* Failed */
+    }
+
+/*
+ * Convert address into a string
+ * form that can be displayed:
+ */
+    z = snprintf(buf,bufsiz, "%s:%u",
+    inet_ntoa(adr_inet.sin_addr),
+   (unsigned)ntohs(adr_inet.sin_port));
+
+    if ( z == -1 ) {
+       return NULL; /* Buffer too small */
+    }
+    return buf;
+ }
+or
+
+#include <sys/socket.h>
+⋮
+int addrlen;
+int rc,
+int newclient_sock;
+int server_sock;
+struct sockaddr_un client_addr;
+⋮
+newclient_sock = accept(server_sock, (struct sockaddr *) 0, (int) 0);
+⋮
+addrlen = sizeof(client_addr);
+rc = getpeername(newclient_sock, (struct sockaddr *)&client_addr,               
+        &addrlen);
+if (rc == -1){     
+        printf(“GETPEERNAME ERROR = %d\n”, sock_errno());
+}
+
+
+
+Writev():
+
+#include < stdio.h>
+#include < sys/types.h>
+#include < sys/stat.h>
+#include < fcntl.h>
+#include < string.h>
+#include < sys/uio.h>
+
+int main (  )
+{
+        struct iovec iov[3];
+        ssize_t nr;
+        int fd, i;
+
+        char *buf[] = {
+                "The term buccaneer comes from the word boucan.\n",
+                "A boucan is a wooden frame used for cooking meat.\n",
+                "Buccaneer is the West Indies name for a pirate.\n" };
+
+        fd = open ("buccaneer.txt", O_WRONLY | O_CREAT | O_TRUNC);
+        if (fd == −1) {
+                perror ("open");
+                return 1;
+        }
+
+        /* fill out three iovec structures */
+        for (i = 0; i < 3; i++) {
+                iov[i].iov_base = buf[i];
+                iov[i].iov_len = strlen(buf[i]) + 1;
+        }
+        /* with a single call, write them all out */
+        nr = writev (fd, iov, 3);
+        if (nr == −1) {
+                perror ("writev");
+                return 1;
+        }
+        printf ("wrote %d bytes\n", nr);
+
+        if (close (fd)) {
+                perror ("close");
+                return 1;
+        }
+
+        return 0;
+}
+
+Running the program produces the desired result:
+
+$ ./writev
+wrote 148 bytes
+As does reading the file:
+
+$ cat buccaneer.txt
+The term buccaneer comes from the word boucan.
+A boucan is a wooden frame used for cooking meat.
+Buccaneer is the West Indies name for a pirate.
+
+
+readv( ) example:
+
+
+#include < stdio.h>
+#include < sys/types.h>
+#include < sys/stat.h>
+#include < fcntl.h>
+#include < sys/uio.h>
+
+int main (  )
+{
+        char foo[48], bar[51], baz[49];
+        struct iovec iov[3];
+        ssize_t nr;
+        int fd, i;
+
+        fd = open ("buccaneer.txt", O_RDONLY);
+        if (fd == −1) {
+                perror ("open");
+                return 1;
+        }
+
+        /* set up our iovec structures */
+        iov[0].iov_base = foo;
+        iov[0].iov_len = sizeof (foo);
+        iov[1].iov_base = bar;
+        iov[1].iov_len = sizeof (bar);
+        iov[2].iov_base = baz;
+        iov[2].iov_len = sizeof (baz);
+
+        /* read into the structures with a single call */
+        nr = readv (fd, iov, 3);
+        if (nr == −1) {
+                perror ("readv");
+                return 1;
+        }
+
+        for (i = 0; i < 3; i++)
+                printf ("%d: %s", i, (char *) iov[i].iov_base);
+
+        if (close (fd)) {
+                perror ("close");
+                return 1;
+        }
+
+        return 0;
+}
+Running this program after running the previous program produces the following results:
+
+$ ./readv
+0: The term buccaneer comes from the word boucan.
+1: A boucan is a wooden frame used for cooking meat.
+2: Buccaneer is the West Indies name for a pirate.
+
+
+
+
+
+<hr>
+
+
+
+EXPERIMENT-8
+Implementation of concurrent chat server that allows current logged in users to
+communicate one with other.
+
+Program:
+ChatServer.java
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.concurrent.Executors;
+public class ChatServer {
+    // All client names, so we can check for duplicates upon registration.
+    private static Set< String> names = new HashSet< >();
+    // The set of all the print writers for all the clients, used for broadcast.
+    private static Set< PrintWriter> writers = new HashSet< >();
+    public static void main(String[] args) throws Exception {
+        System.out.println("The chat server is running...");
+        var pool = Executors.newFixedThreadPool(500);
+        try (var listener = new ServerSocket(59001)) {
+            while (true) {
+                pool.execute(new Handler(listener.accept()));
+            }
+        }
+    }
+    private static class Handler implements Runnable {
+        private String name;
+        private Socket socket;
+        private Scanner in;
+        private PrintWriter out;
+        public Handler(Socket socket) {
+            this.socket = socket;
+        }
+        public void run() {
+            try {
+                in = new Scanner(socket.getInputStream());
+                out = new PrintWriter(socket.getOutputStream(), true);
+                // Keep requesting a name until we get a unique one.
+                while (true) {
+                    out.println("SUBMITNAME");
+                    name = in.nextLine();
+                    if (name == null) {
+                        return;
+                    }
+                    synchronized (names) {
+                        if (!name.isBlank() && !names.contains(name)) {
+                            names.add(name);
+                            break;
+                        }
+                    }
+                }
+                out.println("NAMEACCEPTED " + name);
+                for (PrintWriter writer : writers) {
+                    writer.println("MESSAGE " + name + " has joined");
+                }
+                writers.add(out);
+                // Accept messages from this client and broadcast them.
+                while (true) {
+                    String input = in.nextLine();
+                    if (input.toLowerCase().startsWith("/quit")) {
+                        return;
+                    }
+                    for (PrintWriter writer : writers) {
+                        writer.println("MESSAGE " + name + ": " + input);
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+            } finally {
+                if (out != null) {
+                    writers.remove(out);
+                }
+                if (name != null) {
+                    System.out.println(name + " is leaving");
+                    names.remove(name);
+                    for (PrintWriter writer : writers) {
+                        writer.println("MESSAGE " + name + " has left");
+                    }
+                }
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+    }
+}
+ChatClient.java:
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.Scanner;
+import java.awt.BorderLayout;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+public class ChatClient {
+    String serverAddress;
+    Scanner in;
+    PrintWriter out;
+    JFrame frame = new JFrame("Chatter");
+    JTextField textField = new JTextField(50);
+    JTextArea messageArea = new JTextArea(16, 50);
+        public ChatClient(String serverAddress) {
+        this.serverAddress = serverAddress;
+
+        textField.setEditable(false);
+        messageArea.setEditable(false);
+        frame.getContentPane().add(textField, BorderLayout.SOUTH);
+        frame.getContentPane().add(new JScrollPane(messageArea), BorderLayout.CENTER);
+        frame.pack();
+        // Send on enter then clear to prepare for next message
+        textField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                out.println(textField.getText());
+                textField.setText("");
+            }
+        });
+    }
+    private String getName() {
+        return JOptionPane.showInputDialog(frame, "Choose a screen name:", "Screen name selection",
+                JOptionPane.PLAIN_MESSAGE);
+    }
+    private void run() throws IOException {
+        try {
+            var socket = new Socket(serverAddress, 59001);
+            in = new Scanner(socket.getInputStream());
+            out = new PrintWriter(socket.getOutputStream(), true);
+
+            while (in.hasNextLine()) {
+                var line = in.nextLine();
+                if (line.startsWith("SUBMITNAME")) {
+                    out.println(getName());
+                } else if (line.startsWith("NAMEACCEPTED")) {
+                    this.frame.setTitle("Chatter - " + line.substring(13));
+                    textField.setEditable(true);
+                } else if (line.startsWith("MESSAGE")) {
+                    messageArea.append(line.substring(8) + "\n");
+                }
+            }
+        } finally {
+            frame.setVisible(false);
+            frame.dispose();
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        if (args.length != 1) {
+            System.err.println("Pass the server IP as the sole command line argument");
+            return;
+        }
+        var client = new ChatClient(args[0]);
+        client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        client.frame.setVisible(true);
+        client.run();
+    }
+}
+OR
+// Java implementation of  Server side
+// It contains two classes : Server and ClientHandler
+// Save file as Server.java
+ 
+import java.io.*;
+import java.util.*;
+import java.net.*;
+ 
+// Server class
+public class Server
+{
+ 
+    // Vector to store active clients
+    static Vector< ClientHandler> ar = new Vector< >();
+     
+    // counter for clients
+    static int i = 0;
+ 
+    public static void main(String[] args) throws IOException
+    {
+        // server is listening on port 1234
+        ServerSocket ss = new ServerSocket(1234);
+         
+        Socket s;
+         
+        // running infinite loop for getting
+        // client request
+        while (true)
+        {
+            // Accept the incoming request
+            s = ss.accept();
+ 
+            System.out.println("New client request received : " + s);
+             
+            // obtain input and output streams
+            DataInputStream dis = new DataInputStream(s.getInputStream());
+            DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+             
+            System.out.println("Creating a new handler for this client...");
+ 
+            // Create a new handler object for handling this request.
+            ClientHandler mtch = new ClientHandler(s,"client " + i, dis, dos);
+ 
+            // Create a new Thread with this object.
+            Thread t = new Thread(mtch);
+             
+            System.out.println("Adding this client to active client list");
+ 
+            // add this client to active clients list
+            ar.add(mtch);
+ 
+            // start the thread.
+            t.start();
+ 
+            // increment i for new client.
+            // i is used for naming only, and can be replaced
+            // by any naming scheme
+            i++;
+ 
+        }
+    }
+}
+ 
+// ClientHandler class
+class ClientHandler implements Runnable
+{
+    Scanner scn = new Scanner(System.in);
+    private String name;
+    final DataInputStream dis;
+    final DataOutputStream dos;
+    Socket s;
+    boolean isloggedin;
+     
+    // constructor
+    public ClientHandler(Socket s, String name,
+                            DataInputStream dis, DataOutputStream dos) {
+        this.dis = dis;
+        this.dos = dos;
+        this.name = name;
+        this.s = s;
+        this.isloggedin=true;
+    }
+ 
+    @Override
+    public void run() {
+ 
+        String received;
+        while (true)
+        {
+            try
+            {
+                // receive the string
+                received = dis.readUTF();
+                 
+                System.out.println(received);
+                 
+                if(received.equals("logout")){
+                    this.isloggedin=false;
+                    this.s.close();
+                    break;
+                }
+                 
+                // break the string into message and recipient part
+                StringTokenizer st = new StringTokenizer(received, "#");
+                String MsgToSend = st.nextToken();
+                String recipient = st.nextToken();
+ 
+                // search for the recipient in the connected devices list.
+                // ar is the vector storing client of active users
+                for (ClientHandler mc : Server.ar)
+                {
+                    // if the recipient is found, write on its
+                    // output stream
+                    if (mc.name.equals(recipient) && mc.isloggedin==true)
+                    {
+                        mc.dos.writeUTF(this.name+" : "+MsgToSend);
+                        break;
+                    }
+                }
+            } catch (IOException e) {
+                 
+                e.printStackTrace();
+            }
+             
+        }
+        try
+        {
+            // closing resources
+            this.dis.close();
+            this.dos.close();
+             
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+}
+// Java implementation for multithreaded chat client
+// Save file as Client.java
+  
+import java.io.*;
+import java.net.*;
+import java.util.Scanner;
+  
+public class Client 
+{
+    final static int ServerPort = 1234;
+  
+    public static void main(String args[]) throws UnknownHostException, IOException 
+    {
+        Scanner scn = new Scanner(System.in);
+          
+        // getting localhost ip
+        InetAddress ip = InetAddress.getByName("localhost");
+          
+        // establish the connection
+        Socket s = new Socket(ip, ServerPort);
+          
+        // obtaining input and out streams
+        DataInputStream dis = new DataInputStream(s.getInputStream());
+        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+  
+        // sendMessage thread
+        Thread sendMessage = new Thread(new Runnable() 
+        {
+            @Override
+            public void run() {
+                while (true) {
+  
+                    // read the message to deliver.
+                    String msg = scn.nextLine();
+                      
+                    try {
+                        // write on the output stream
+                        dos.writeUTF(msg);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+          
+        // readMessage thread
+        Thread readMessage = new Thread(new Runnable() 
+        {
+            @Override
+            public void run() {
+  
+                while (true) {
+                    try {
+                        // read the message sent to this client
+                        String msg = dis.readUTF();
+                        System.out.println(msg);
+                    } catch (IOException e) {
+  
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+  
+        sendMessage.start();
+        readMessage.start();
+  
+    }
+}
+OUTPUT:
+
+
+
+
+
+<hr>
+
+
+
+
+EXPERIMENT-9
+Implementation of DNS.
+
+Program:
+import java.net.*;
+import java.io.*;
+import java.util.*;
+public class DNS 
+{
+ public static void main(String[] args) 
+ {
+  int n;
+  BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+  do
+  {
+   System.out.println("\n Menu: \n 1. DNS 2. Reverse DNS 3. Exit \n");
+   System.out.println("\n Enter your choice");
+   n = Integer.parseInt(System.console().readLine()); 
+   if(n==1)
+   {
+    try 
+    {
+     System.out.println("\n Enter Host Name ");
+     String hname=in.readLine();
+     InetAddress address;
+     address = InetAddress.getByName(hname);
+     System.out.println("Host Name: " + address.getHostName());
+     System.out.println("IP: " + address.getHostAddress());
+    } 
+    catch(IOException ioe) 
+    {
+     ioe.printStackTrace();
+    }
+   }
+   if(n==2)
+   {
+    try 
+    {
+       System.out.println("\n Enter IP address");
+       String ipstr = in.readLine();
+       InetAddress ia = InetAddress.getByName(ipstr);
+       System.out.println("IP: "+ipstr);
+       System.out.println("Host Name: " +ia.getHostName());
+     } 
+    catch(IOException ioe) 
+    {
+     ioe.printStackTrace();
+    }
+   }
+  }while(!(n==3));
+ }
+}
+OUTPUT:
+
+
+
+
+<hr>
+
+
+
+
+EXPERIMENT-10
+
+Implementation of Ping service.
+
+Program:
+import java.io.*;
+import java.net.*;
+class pingserver
+{
+public static void main(String args[])
+{
+try
+{
+String str;
+System.out.print(" Enter the IP Address to be Ping : ");
+BufferedReader buf1=new BufferedReader(new
+InputStreamReader(System.in));
+String ip=buf1.readLine();
+Runtime H=Runtime.getRuntime();
+Process p=H.exec("ping " + ip);
+InputStream in=p.getInputStream();
+BufferedReader buf2=new BufferedReader(new
+InputStreamReader(in));
+while((str=buf2.readLine())!=null)
+{
+System.out.println(" " + str);
+}
+}
+catch(Exception e)
+{
+System.out.println(e.getMessage());
+}
+}
+}
+OUTPUT:
+
+
+
+<hr>
+
+
+
+
+
+
+
+
+
+    </pre>
+</body>
+</html>
